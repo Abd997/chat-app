@@ -1,7 +1,7 @@
 import dotenv from "dotenv"
 import express from "express"
 import Router from "express-promise-router"
-import { MessagesRoutes, authRoutes } from "./routes/index.js"
+import { MessagesRoutes, authRoutes, userRoutes } from "./routes/index.js"
 import { connectToDB } from "./db/connect.js"
 
 dotenv.config()
@@ -14,6 +14,7 @@ router.use(express.json())
 
 router.use("/api/auth", authRoutes)
 router.use("/api/messages", MessagesRoutes)
+router.use("/api/users", userRoutes)
 
 app.use((error, req, res, next) => {
     console.log("error handler")

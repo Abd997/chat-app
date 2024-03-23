@@ -1,5 +1,5 @@
 import { BadRequestError } from "../errors/index.js"
-import { Conversation } from "../models/index.js"
+import { Conversation, Message } from "../models/index.js"
 
 const messageController = {}
 
@@ -10,22 +10,35 @@ messageController.createMessage = async (req, res) => {
         message,
     } = req.body
     
-    const conversation = await Conversation.findOne({
+    let conversation = await Conversation.findOne({
         participants: { $all: [senderId, recieverId] }
     })
-    let newConversation
     if (!conversation) {
-        newConversation = new Conversation({
+        conversation = Conversation.create({
             participants: [senderId, recieverId]
-        }).save()
+        })
     }
 
-    const newMessage = new Conversation({
+    const newMessage = Message.create({
         senderId,
         recieverId,
         message
-    }).save()
+    })
+    conversation.participants.push(newMessage._id)
+    await conversation.save()
+    
     return res.status(201).send(newMessage)
+}
+
+messageController.getMessages = async (req, res) => {
+    const {
+
+    } = req.query
+    const conversation = await Conversation.findOne({
+        participants: { $all: [senderId, recieverId] }
+    }).populate(Message.modelName)
+
+    return res.send(conversation)
 }
 
 export { messageController }
